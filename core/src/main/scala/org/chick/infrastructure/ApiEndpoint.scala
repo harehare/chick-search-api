@@ -31,8 +31,8 @@ class ApiEndpoint(val index: IndexService) {
       for {
         _ <- index.init
         items <- req.as[List[IndexItem]]
-        ids <- index.add(items)
-        res <- Ok(IndexResponse(ids).asJson)
+        count <- index.add(items)
+        res <- Ok(IndexResponse(count).asJson)
       } yield (res)
     case _ -> Root =>
       MethodNotAllowed()

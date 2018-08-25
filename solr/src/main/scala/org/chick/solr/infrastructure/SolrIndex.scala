@@ -1,12 +1,11 @@
 package org.chick.solr.infrastructure
 
 import cats.effect.IO
-import com.github.takezoe.solr.scala.{MapQueryResult, Order}
 import com.github.takezoe.solr.scala.async.AsyncSolrClient
 import org.chick.model.IndexItem
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 object SolrIndex {
@@ -14,7 +13,7 @@ object SolrIndex {
 
   val client = new AsyncSolrClient(sys.env("SOLR_URL"))
 
-  def add(items: Seq[IndexItem]): IO[Seq[Unit]] =
+  def add(items: Seq[IndexItem]): IO[Int] =
     IO.async { cb =>
       Future
         .traverse(items) { x =>
@@ -29,10 +28,7 @@ object SolrIndex {
             ))
         }
         .onComplete {
-          case Success(a) => {
-            client.commit
-            cb(Right(a))
-          }
+          case Success(_) => cb(Right(items.length))
           case Failure(e) => cb(Left(e))
         }
     }

@@ -1,0 +1,17 @@
+version: '3'
+services:
+  solr:
+    image: solr
+    container_name: solr
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+    - chickindex:/opt/solr/server/solr/
+    ports:
+    - 8983:8983
+
+volumes:
+  chickindex:
+    driver: local

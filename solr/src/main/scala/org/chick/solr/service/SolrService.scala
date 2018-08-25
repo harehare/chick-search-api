@@ -10,10 +10,10 @@ class SolrService extends IndexService {
 
   implicit val indexName = "chick"
 
-  override def add(items: Seq[IndexItem]): IO[Seq[String]] = {
+  override def add(items: Seq[IndexItem]): IO[Int] = {
     for {
-      _ <- SolrIndex.add(items)
-    } yield Nil
+      count <- SolrIndex.add(items)
+    } yield count
   }
 
   override def query(q: String): IO[Seq[IndexItem]] =

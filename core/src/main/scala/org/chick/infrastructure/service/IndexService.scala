@@ -7,7 +7,7 @@ trait IndexService {
 
   def init(): IO[Option[_]]
 
-  def add(items: Seq[IndexItem]): IO[Seq[String]]
+  def add(items: Seq[IndexItem]): IO[Int]
 
   def query(q: String): IO[Seq[IndexItem]]
 }

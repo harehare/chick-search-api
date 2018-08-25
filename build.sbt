@@ -62,7 +62,7 @@ lazy val commonSettings = Def.settings(
 lazy val root = project
   .in(file("."))
   .settings(commonSettings)
-  .aggregate(core, algolia, elasticsearch, solr)
+  .aggregate(core, algolia, elasticsearch, solr, mysql)
 
 lazy val core = project
   .in(file("core"))
@@ -89,32 +89,59 @@ lazy val algolia = project
   .in(file("algolia"))
   .settings(commonSettings)
   .dependsOn(core % "compile->compile; test->test")
+  .enablePlugins(JavaAppPackaging, AshScriptPlugin, DockerPlugin)
   .settings(
+    name := "chick-algolia-api",
+    version := "1.0.0-SNAPSHOT",
     libraryDependencies ++= Seq(
       "com.algolia"    %% "algoliasearch-scala"  % "[1,)",
       "ch.qos.logback" %  "logback-classic"      % "1.2.3",
       "org.json4s"     %% "json4s-jackson"       % "3.6.0",
     ),
+    dockerBaseImage := "java:8-jdk-alpine",
   )
 
 lazy val elasticsearch = project
   .in(file("elasticsearch"))
   .settings(commonSettings)
   .dependsOn(core % "compile->compile; test->test")
+  .enablePlugins(JavaAppPackaging, AshScriptPlugin, DockerPlugin)
   .settings(
+    name := "chick-elasticsearch-api",
+    version := "1.0.0-SNAPSHOT",
     libraryDependencies ++= Seq(
       "com.sksamuel.elastic4s" %% "elastic4s-core" % elastic4sVersion,
       "com.sksamuel.elastic4s" %% "elastic4s-http" % elastic4sVersion,
       "com.sksamuel.elastic4s" %% "elastic4s-circe" % elastic4sVersion,
     ),
+    dockerBaseImage := "java:8-jdk-alpine",
   )
 
 lazy val solr = project
   .in(file("solr"))
   .settings(commonSettings)
   .dependsOn(core % "compile->compile; test->test")
+  .enablePlugins(JavaAppPackaging, AshScriptPlugin, DockerPlugin)
   .settings(
+    name := "chick-solr-api",
+    version := "1.0.0-SNAPSHOT",
     libraryDependencies ++= Seq(
       "com.github.takezoe" %% "solr-scala-client" % "0.0.19"
     ),
+    dockerBaseImage := "java:8-jdk-alpine",
+  )
+
+lazy val mysql = project
+  .in(file("mysql"))
+  .settings(commonSettings)
+  .dependsOn(core % "compile->compile; test->test")
+  .enablePlugins(JavaAppPackaging, AshScriptPlugin, DockerPlugin)
+  .settings(
+    name := "chick-mysql-api",
+    version := "1.0.0-SNAPSHOT",
+    libraryDependencies ++= Seq(
+      "org.tpolecat" %% "doobie-core" % "0.5.3",
+      "mysql" %  "mysql-connector-java" % "5.1.45"
+    ),
+    dockerBaseImage := "java:8-jdk-alpine",
   )

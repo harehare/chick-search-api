@@ -29,10 +29,10 @@ class ElasticsarchService extends IndexService {
         ))
   }
 
-  override def add(items: Seq[IndexItem]): IO[Seq[String]] = {
+  override def add(items: Seq[IndexItem]): IO[Int] = {
     for {
       result <- ElasticsearchIndex.add(items)
-    } yield result.items.map(x => x.id)
+    } yield result.items.length
   }
 
   override def query(q: String): IO[Seq[IndexItem]] =

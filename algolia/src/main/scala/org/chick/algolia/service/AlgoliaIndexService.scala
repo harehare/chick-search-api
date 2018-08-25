@@ -13,10 +13,10 @@ class AlgoliaIndexService extends IndexService {
 
   implicit val jsonFormats = DefaultFormats + new IndexItemSerializer()
 
-  override def add(items: Seq[IndexItem]): IO[Seq[String]] = {
+  override def add(items: Seq[IndexItem]): IO[Int] = {
     for {
       result <- AlgoliaIndex.add(items)
-    } yield result.objectIDs
+    } yield result.objectIDs.length
   }
 
   override def query(q: String): IO[Seq[IndexItem]] =
