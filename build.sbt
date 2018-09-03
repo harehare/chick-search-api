@@ -69,19 +69,20 @@ lazy val core = project
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel"  %% "cats-core"            % "1.0.1",
-      "io.circe"       %% "circe-core"           % circeVersion,
-      "io.circe"       %% "circe-generic"        % circeVersion,
-      "io.circe"       %% "circe-generic-extras" % circeVersion,
-      "io.circe"       %% "circe-java8"          % circeVersion,
-      "io.circe"       %% "circe-parser"         % circeVersion,
-      "org.typelevel"  %% "cats-effect"          % "0.9",
-      "org.typelevel"  %% "mouse"                % "0.17",
-      "org.http4s"     %% "http4s-blaze-client"  % http4sVersion,
-      "org.http4s"     %% "http4s-blaze-server"  % http4sVersion,
-      "org.http4s"     %% "http4s-circe"         % http4sVersion,
-      "org.http4s"     %% "http4s-dsl"           % http4sVersion,
-      "ch.qos.logback" %  "logback-classic"      % "1.2.3",
+      "org.typelevel"              %% "cats-core"            % "1.2.0",
+      "io.circe"                   %% "circe-core"           % circeVersion,
+      "io.circe"                   %% "circe-generic"        % circeVersion,
+      "io.circe"                   %% "circe-generic-extras" % circeVersion,
+      "io.circe"                   %% "circe-java8"          % circeVersion,
+      "io.circe"                   %% "circe-parser"         % circeVersion,
+      "org.typelevel"              %% "cats-effect"          % "1.0.0-RC2",
+      "org.typelevel"              %% "mouse"                % "0.17",
+      "org.http4s"                 %% "http4s-blaze-client"  % http4sVersion,
+      "org.http4s"                 %% "http4s-blaze-server"  % http4sVersion,
+      "org.http4s"                 %% "http4s-circe"         % http4sVersion,
+      "org.http4s"                 %% "http4s-dsl"           % http4sVersion,
+      "com.typesafe.scala-logging" %% "scala-logging"        % "3.9.0",
+      "ch.qos.logback"             %  "logback-classic"      % "1.2.3",
     ),
   )
 

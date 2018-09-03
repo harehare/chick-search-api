@@ -9,7 +9,7 @@ import org.chick.model.{IndexItem, ItemType}
 import org.json4s.JsonDSL._
 import org.json4s.{CustomSerializer, DefaultFormats, JObject, _}
 
-class AlgoliaIndexService extends IndexService {
+object AlgoliaIndexService extends IndexService {
 
   implicit val jsonFormats = DefaultFormats + new IndexItemSerializer()
 

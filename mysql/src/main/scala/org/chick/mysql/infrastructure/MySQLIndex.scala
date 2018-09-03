@@ -10,8 +10,6 @@ import doobie.util.meta.Meta
 import doobie.util.transactor.Transactor
 import org.chick.model.{IndexItem, ItemType}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 object MySQLIndex {
 
   val xa = Transactor.fromDriverManager[IO](

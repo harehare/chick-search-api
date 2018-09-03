@@ -1,18 +1,24 @@
 package org.chick
 
-import cats.effect.IO
-import fs2.StreamApp.ExitCode
-import fs2.{Stream, StreamApp}
+import cats.effect.concurrent.Ref
+import cats.effect.{ExitCode, IO, IOApp}
+import cats.implicits._
 import org.chick.infrastructure.ApiEndpoint
+import org.chick.infrastructure.service.IndexService
+import org.chick.model.IndexItem
 import org.http4s.server.blaze.BlazeBuilder
 
-import scala.concurrent.ExecutionContext.Implicits.global
+abstract class HttpServer(val service: IndexService) extends IOApp {
 
-abstract class HttpServer(endpoint: ApiEndpoint) extends StreamApp[IO] {
-  override def stream(args: List[String],
-                      requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
-    BlazeBuilder[IO]
-      .bindHttp(sys.env("PORT").toInt, "0.0.0.0")
-      .mountService(endpoint.service, "/")
-      .serve
+  def run(args: List[String]): IO[ExitCode] =
+    for {
+      ref <- Ref.of[IO, List[IndexItem]](Nil)
+      endpoint <- IO(new ApiEndpoint(service, ref))
+      _ <- List(new SearchIndexer(service, ref).start,
+                BlazeBuilder[IO]
+                  .bindHttp(sys.env("PORT").toInt, "0.0.0.0")
+                  .mountService(endpoint.service, "/")
+                  .start).parSequence.void
+    } yield ExitCode.Success
+
 }

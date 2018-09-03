@@ -6,7 +6,7 @@ import org.chick.infrastructure.service.IndexService
 import org.chick.model.{IndexItem, ItemType}
 import org.chick.solr.infrastructure.SolrIndex
 
-class SolrService extends IndexService {
+object SolrService extends IndexService {
 
   implicit val indexName = "chick"
 

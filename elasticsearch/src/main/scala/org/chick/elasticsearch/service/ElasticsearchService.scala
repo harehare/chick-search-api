@@ -9,7 +9,7 @@ import org.chick.model.{IndexItem, ItemType}
 
 import scala.util.Try
 
-class ElasticsarchService extends IndexService {
+object ElasticsarchService extends IndexService {
 
   implicit val indexName = "chick"
 

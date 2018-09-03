@@ -5,7 +5,7 @@ import org.chick.infrastructure.service.IndexService
 import org.chick.model.IndexItem
 import org.chick.mysql.infrastructure.MySQLIndex
 
-class MySQLService extends IndexService {
+object MySQLService extends IndexService {
 
   private implicit val tableName = "chick001"
 
