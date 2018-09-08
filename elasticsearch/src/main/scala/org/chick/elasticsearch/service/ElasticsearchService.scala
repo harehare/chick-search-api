@@ -31,8 +31,8 @@ object ElasticsarchService extends IndexService {
 
   override def add(items: Seq[IndexItem]): IO[Int] = {
     for {
-      result <- ElasticsearchIndex.add(items)
-    } yield result.items.length
+      _ <- ElasticsearchIndex.add(items)
+    } yield items.length
   }
 
   override def query(q: String): IO[Seq[IndexItem]] =

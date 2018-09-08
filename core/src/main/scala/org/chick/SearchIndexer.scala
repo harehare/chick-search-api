@@ -17,12 +17,14 @@ class SearchIndexer(index: IndexService, ref: Ref[IO, List[IndexItem]]) {
 
   def start(): IO[Unit] =
     for {
-      _ <- IO.sleep(3.seconds)
+      _ <- IO.sleep(10.seconds)
       items <- ref.get
-      _ <- (items.isEmpty).fold(IO.unit, index.add(items))
+      _ <- ref.set(Nil)
+      _ <- IO.pure(
+        (items.isEmpty)
+          .fold(IO.unit, index.add(items.distinct)))
       _ <- IO(
         (items.isEmpty).fold((), logger.info(s"indexing ${items.length}")))
-      _ <- ref.set(Nil)
       _ <- start
     } yield ()
 }

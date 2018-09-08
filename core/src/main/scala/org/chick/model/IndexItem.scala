@@ -20,6 +20,6 @@ object ItemType extends (String => ItemType) {
     case "bookmark" => Bookmark
     case "history"  => History
     case "pocket"   => Pocket
-    case x          => throw new IllegalArgumentException(s"invalid type: $x")
+    case _          => History
   }
 }

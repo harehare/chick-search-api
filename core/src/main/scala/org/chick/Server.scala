@@ -14,11 +14,14 @@ abstract class HttpServer(val service: IndexService) extends IOApp {
     for {
       ref <- Ref.of[IO, List[IndexItem]](Nil)
       endpoint <- IO(new ApiEndpoint(service, ref))
-      _ <- List(new SearchIndexer(service, ref).start,
-                BlazeBuilder[IO]
-                  .bindHttp(sys.env("PORT").toInt, "0.0.0.0")
-                  .mountService(endpoint.service, "/")
-                  .start).parSequence.void
+      _ <- List(
+        new SearchIndexer(service, ref).start,
+        BlazeBuilder[IO]
+          .withNio2(true)
+          .bindHttp(sys.env("PORT").toInt, "0.0.0.0")
+          .mountService(endpoint.service, "/")
+          .start
+      ).parSequence.void
     } yield ExitCode.Success
 
 }
