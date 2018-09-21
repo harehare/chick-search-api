@@ -1,31 +1,34 @@
 package org.chick.algolia.service
 
-import cats.effect.IO
+import cats.effect.Async
 import cats.implicits._
+import org.chick.ShowImplicits._
 import org.chick.algolia.infrastructure.AlgoliaIndex
 import org.chick.infrastructure.service.IndexService
-import org.chick.infrastructure.ShowImplicits._
 import org.chick.model.{IndexItem, ItemType}
 import org.json4s.JsonDSL._
 import org.json4s.{CustomSerializer, DefaultFormats, JObject, _}
 
-object AlgoliaIndexService extends IndexService {
+class AlgoliaService[F[_]](implicit F: Async[F]) extends IndexService[F] {
 
   implicit val jsonFormats = DefaultFormats + new IndexItemSerializer()
+  val index = new AlgoliaIndex[F]
 
-  override def add(items: Seq[IndexItem]): IO[Int] = {
+  override def add(items: Seq[IndexItem]): F[Int] = {
     for {
-      result <- AlgoliaIndex.add(items)
+      result <- index.add(items)
     } yield result.objectIDs.length
   }
 
-  override def query(q: String): IO[Seq[IndexItem]] =
+  override def query(q: String): F[Seq[IndexItem]] =
     for {
-      searchResult <- AlgoliaIndex.query(q)
-      items <- IO(searchResult.hits.map(x => x.e.extract[IndexItem]))
+      searchResult <- index.query(q)
+      items <- F.delay {
+        searchResult.hits.map(x => x.e.extract[IndexItem])
+      }
     } yield items
 
-  override def init(): IO[Option[Unit]] = IO.pure(None)
+  override def init(): F[Boolean] = F.pure(true)
 }
 
 class IndexItemSerializer

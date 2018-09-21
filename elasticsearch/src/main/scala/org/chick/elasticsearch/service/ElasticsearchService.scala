@@ -1,15 +1,15 @@
 package org.chick.elasticsearch.service
 
-import cats.effect.IO
+import cats.effect.Sync
+import cats.syntax.flatMap._
+import cats.syntax.functor._
 import com.sksamuel.elastic4s.{Hit, HitReader}
-import mouse.boolean._
 import org.chick.elasticsearch.infrastructure.ElasticsearchIndex
 import org.chick.infrastructure.service.IndexService
 import org.chick.model.{IndexItem, ItemType}
-
 import scala.util.Try
 
-object ElasticsarchService extends IndexService {
+class ElasticsarchService[F[_]](implicit F: Sync[F]) extends IndexService[F] {
 
   implicit val indexName = "chick"
 
@@ -29,21 +29,24 @@ object ElasticsarchService extends IndexService {
         ))
   }
 
-  override def add(items: Seq[IndexItem]): IO[Int] = {
-    for {
-      _ <- ElasticsearchIndex.add(items)
-    } yield items.length
-  }
+  override def add(items: Seq[IndexItem]): F[Int] =
+    F.delay {
+      ElasticsearchIndex.add(items)
+      items.length
+    }
 
-  override def query(q: String): IO[Seq[IndexItem]] =
-    for {
-      searchResult <- ElasticsearchIndex.query(q)
-      items <- IO(searchResult.hits.hits.map(x => x.to[IndexItem]))
-    } yield items
+  override def query(q: String): F[Seq[IndexItem]] =
+    F.delay {
+      ElasticsearchIndex.query(q).hits.hits.map(x => x.to[IndexItem])
+    }
 
-  override def init(): IO[Option[Boolean]] =
+  override def init(): F[Boolean] =
     for {
-      create <- ElasticsearchIndex.create(currentVersion)
-      alias <- ElasticsearchIndex.switchAliases(oldVersion, currentVersion)
-    } yield (create.acknowledged && alias.acknowledged).fold(Some(true), None)
+      create <- F.delay{
+        ElasticsearchIndex.create(currentVersion)
+      }
+      alias <- F.delay{
+        ElasticsearchIndex.switchAliases(oldVersion, currentVersion)
+      }
+    } yield (create.acknowledged && alias.acknowledged)
 }

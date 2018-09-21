@@ -4,7 +4,7 @@ version := "0.1"
 
 scalaVersion := "2.12.6"
 
-val http4sVersion = "0.19.0-M1"
+val http4sVersion = "0.19.0-M2"
 val elastic4sVersion = "6.3.6"
 val circeVersion = "0.9.1"
 
@@ -69,13 +69,13 @@ lazy val core = project
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel"              %% "cats-core"            % "1.2.0",
+      "org.typelevel"              %% "cats-core"            % "1.4.0",
       "io.circe"                   %% "circe-core"           % circeVersion,
       "io.circe"                   %% "circe-generic"        % circeVersion,
       "io.circe"                   %% "circe-generic-extras" % circeVersion,
       "io.circe"                   %% "circe-java8"          % circeVersion,
       "io.circe"                   %% "circe-parser"         % circeVersion,
-      "org.typelevel"              %% "cats-effect"          % "1.0.0-RC2",
+      "org.typelevel"              %% "cats-effect"          % "1.0.0",
       "org.typelevel"              %% "mouse"                % "0.17",
       "org.http4s"                 %% "http4s-blaze-client"  % http4sVersion,
       "org.http4s"                 %% "http4s-blaze-server"  % http4sVersion,

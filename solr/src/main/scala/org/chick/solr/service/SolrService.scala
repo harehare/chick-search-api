@@ -1,25 +1,27 @@
 package org.chick.solr.service
 
-import cats.effect.IO
+import cats.effect.Async
+import cats.syntax.flatMap._
+import cats.syntax.functor._
 import mouse.option._
 import org.chick.infrastructure.service.IndexService
 import org.chick.model.{IndexItem, ItemType}
 import org.chick.solr.infrastructure.SolrIndex
 
-object SolrService extends IndexService {
+class SolrService[F[_]](implicit F: Async[F]) extends IndexService[F] {
 
   implicit val indexName = "chick"
+  val index = new SolrIndex[F]
 
-  override def add(items: Seq[IndexItem]): IO[Int] = {
+  override def add(items: Seq[IndexItem]): F[Int] =
     for {
-      count <- SolrIndex.add(items)
+      count <- index.add(items)
     } yield count
-  }
 
-  override def query(q: String): IO[Seq[IndexItem]] =
+  override def query(q: String): F[Seq[IndexItem]] =
     for {
-      searchResult <- SolrIndex.query(q)
-      items <- IO(
+      searchResult <- index.query(q)
+      items <- F.delay {
         searchResult.documents.map(x =>
           IndexItem(
             x.get("title_txt_cjk").getOrElse("").toString,
@@ -30,8 +32,9 @@ object SolrService extends IndexService {
             Some(x
               .get("createdAt_l")
               .cata(_.toString.toLong, System.currentTimeMillis))
-        )))
+          ))
+      }
     } yield items
 
-  override def init(): IO[Option[Unit]] = IO.pure(None)
+  override def init(): F[Boolean] = F.pure(true)
 }

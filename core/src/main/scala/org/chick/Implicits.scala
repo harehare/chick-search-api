@@ -1,4 +1,4 @@
-package org.chick.infrastructure
+package org.chick
 
 import cats.Show
 import org.chick.model.ItemType

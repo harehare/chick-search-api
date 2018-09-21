@@ -1,32 +1,13 @@
 package org.chick.infrastructure.service
 
-import cats.effect.IO
-import io.circe.generic.auto._
-import io.circe.syntax._
-import org.chick.model.{IndexItem, SearchResponse}
-import org.chick.infrastructure.JsonImplicits._
+import org.chick.model.IndexItem
 
-trait IndexService {
+trait IndexService[F[_]] {
 
-  def init(): IO[Option[_]]
+  def init(): F[Boolean]
 
-  def add(items: Seq[IndexItem]): IO[Int]
+  def add(items: Seq[IndexItem]): F[Int]
 
-  def query(q: String): IO[Seq[IndexItem]]
+  def query(q: String): F[Seq[IndexItem]]
 
-  def search(q: String) = {
-    for {
-      result <- query(q)
-      response <- IO {
-        result.map(
-          item =>
-            SearchResponse(item.title,
-                           item.url,
-                           item.body.slice(0, 100).trim,
-                           item.itemType,
-                           item.tags,
-                           false))
-      }
-    } yield response.toList.take(50).asJson
-  }
 }

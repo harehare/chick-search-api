@@ -1,20 +1,19 @@
 package org.chick.solr.infrastructure
 
-import cats.effect.IO
+import cats.effect.Async
 import com.github.takezoe.solr.scala.async.AsyncSolrClient
 import org.chick.model.IndexItem
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-object SolrIndex {
+class SolrIndex[F[_]](implicit F: Async[F]) {
   import com.github.takezoe.solr.scala._
 
   val client = new AsyncSolrClient(sys.env("SOLR_URL"))
 
-  def add(items: Seq[IndexItem]): IO[Int] =
-    IO.async { cb =>
+  def add(items: Seq[IndexItem]): F[Int] =
+    F.async{ cb =>
       Future
         .traverse(items) { x =>
           client
@@ -33,8 +32,8 @@ object SolrIndex {
         }
     }
 
-  def query(q: String): IO[MapQueryResult] =
-    liftIO(
+  def query(q: String): F[MapQueryResult] =
+    lift(
       client
         .query("body_txt_cjk:%q%^10.0 OR title_txt_cjk:%q%")
         .fields("title_txt_cjk",
@@ -45,4 +44,12 @@ object SolrIndex {
                 "createdAt_l")
         .sortBy("score", Order.desc)
         .getResultAsMap(Map("q" -> q)))
+
+  def lift[A](fa: => Future[A]): F[A] =
+    F.async { cb =>
+      fa.onComplete {
+        case Success(a) => cb(Right(a))
+        case Failure(e) => cb(Left(e))
+      }
+    }
 }
